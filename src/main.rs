@@ -3,7 +3,9 @@ use std::io::Write;
 use std::sync::Arc;
 
 use raytracer::modules::camera::Camera;
+use raytracer::modules::color::Color;
 use raytracer::modules::hittable_list::HittableList;
+use raytracer::modules::material::{Lambertian, Metal};
 use raytracer::modules::sphere::Sphere;
 use raytracer::modules::vec3::Point3;
 
@@ -13,8 +15,18 @@ fn main() {
 
     // World
     let mut world = HittableList::new();
-    world.add(Arc::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Arc::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+
+    // Make materials
+    let material_ground = Arc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let material_center = Arc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+    let material_left   = Arc::new(Metal::new(Color::new(0.8, 0.8, 0.8), 0.3));
+    let material_right  = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0));
+
+    // Add objects to our world
+    world.add(Arc::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, material_ground)));
+    world.add(Arc::new(Sphere::new(Point3::new(0.0, 0.0, -1.2), 0.5, material_center)));
+    world.add(Arc::new(Sphere::new(Point3::new(-1.0, 0.0, -1.0), 0.5, material_left)));
+    world.add(Arc::new(Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, material_right)));
 
     // Camera
     let mut camera = Camera::default();

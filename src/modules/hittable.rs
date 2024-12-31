@@ -1,21 +1,25 @@
+use std::sync::Arc;
 
 use crate::modules::vec3::Vec3;
 
-use super::{interval::Interval, ray::Ray, vec3::Point3};
+use super::{color::Color, interval::Interval, material::{Lambertian, Material}, ray::Ray, vec3::Point3};
 
 #[derive(Clone)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
+    pub mat: Arc<dyn Material>,
     pub t: f64,
     pub front_face: bool,
 }
 
 impl HitRecord {
     pub fn default() -> Self {
+        let default_material: Arc<dyn Material> = Arc::new(Lambertian::new(Color::new(0.4, 0.4, 0.4)));
         Self {
             p: Point3::new(0.0, 0.0, 0.0),
             normal: Vec3::new(0.0, 0.0, 0.0),
+            mat: default_material,
             t: 0.0,
             front_face: false,
         }

@@ -1,6 +1,6 @@
 use crate::modules::color::write_color;
 
-use super::{color::Color, hittable::{HitRecord, Hittable}, hittable_list::HittableList, interval::Interval, ray::Ray, utils::{random_double, INFINITY}, vec3::{Point3, Vec3}};
+use super::{color::Color, hittable::{HitRecord, Hittable}, hittable_list::HittableList, interval::Interval, ray::Ray, utils::{random_double, INFINITY}, vec3::{random_on_hemisphere, Point3, Vec3}};
 
 
 pub struct Camera {
@@ -54,7 +54,6 @@ impl Camera {
                 // Write color to the image string output with newline
                 let color_string = write_color(pixel_color * self.pixel_samples_scale);
                 image_string.push_str(&color_string);
-                image_string.push('\n');
             }
         }
         eprintln!("Done.\n");
@@ -109,8 +108,12 @@ impl Camera {
         // Someones this calculation is not accurate (floating point rounding error) so we add a small epsilon
         // This fixes the "shadow acne" problem
         if world.hit(r, Interval::new(0.001, INFINITY), &mut rec) {
-            let direction = rec.normal.random_on_hemisphere(rec.normal);
-            return 0.5 * (self.ray_color(&Ray::new(rec.p, direction), depth - 1, world));
+            let mut scattered = Ray::default();
+            let mut attenuation = Color::zero();
+            if rec.mat.scatter(r, &rec, &mut attenuation, &mut scattered) {
+                return attenuation * self.ray_color(&scattered, depth - 1, world);
+            }
+            return Color::zero();
         }
         
         // If no hit, keep the sky gradient

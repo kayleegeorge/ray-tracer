@@ -8,4 +8,5 @@ pub mod modules {
     pub mod utils;
     pub mod interval;
     pub mod camera;
+    pub mod material;
 }

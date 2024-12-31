@@ -1,28 +1,17 @@
-use super::{hittable::{HitRecord, Hittable}, interval::Interval, ray::Ray, vec3::Point3};
+use std::sync::Arc;
 
+use super::{hittable::{HitRecord, Hittable}, interval::Interval, material::Material, ray::Ray, vec3::Point3};
 
-// fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> f64 {
-//     let oc = r.origin() - center;
-//     let a = r.direction().length_squared();
-//     let b = 2.0 * r.direction().dot(&oc);
-//     let c = oc.length_squared() - radius * radius;
-//     let discriminant = b * b - 4.0 * a * c;
-
-//     if discriminant < 0.0 {
-//         return -1.0;
-//     }
-
-//     return (-b - discriminant.sqrt()) / (2.0 * a);
-// }
 
 pub struct Sphere {
     center: Point3,
     radius: f64,
+    mat: Arc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Self {
-        Self { center, radius: f64::max(radius, 0.0) }
+    pub fn new(center: Point3, radius: f64, mat: Arc<dyn Material>) -> Self {
+        Self { center, radius: f64::max(radius, 0.0), mat }
     }
 }
 
@@ -65,6 +54,7 @@ impl Hittable for Sphere {
         rec.p = r.at(rec.t);
         let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, outward_normal);
+        rec.mat = self.mat.clone();
 
         return true;
     }

@@ -57,47 +57,10 @@ impl Vec3 {
         self.e[2] * other.e[2]
     }
 
-    // Random
-    pub fn random(&self) -> Vec3 {
-        Vec3 { e: [random_double(), random_double(), random_double()] }
-    }
-
-    // Random in [min, max]
-    pub fn random_in_range(&self, min: f64, max: f64) -> Vec3 {
-        Vec3 { e: [random_double_range(min, max), random_double_range(min, max), random_double_range(min, max)] }
-    }
-
-    /*
-     * Random unit vector
-     * 
-     * Rejection method:
-     * 1. Generate random vector in [-1, 1] (in a unit sphere)
-     * 2. If the point lies outside the unit sphere or in "black hole" (1e-160 < len_sq <= 1.0), reject it and try again
-     * 3. If the point lies inside the unit sphere, return the unit vector
-     */
-    pub fn random_unit_vector(&self) -> Vec3 {
-        loop {
-            let p = self.random_in_range(-1.0, 1.0);
-            let len_sq = p.length_squared();
-            if (1e-160 < len_sq) && (len_sq <= 1.0) {
-                return p / len_sq.sqrt();
-            }
-        }
-    }
-
-    /*
-     * Random vector on a hemisphere
-     * 
-     * If the dot product of the random vector and the normal is positive, vector is in the correct hemisphere
-     * Otherwise, vector is in the opposite hemisphere & need to invert
-     */
-    pub fn random_on_hemisphere(&self, normal: Vec3) -> Vec3 {
-        let on_unit_sphere = self.random_unit_vector();
-        if on_unit_sphere.dot(&normal) > 0.0 {
-            on_unit_sphere
-        } else {
-            -on_unit_sphere
-        }
+    // Near zero (check close to 0 in all dimensions)
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        (self.e[0].abs() < s) && (self.e[1].abs() < s) && (self.e[2].abs() < s)
     }
 }
 
@@ -199,3 +162,53 @@ impl Div<f64> for Vec3 {
 }
 
 // ----- END OPERATORS -----
+
+// Random
+pub fn random() -> Vec3 {
+    Vec3 { e: [random_double(), random_double(), random_double()] }
+}
+
+// Random in [min, max]
+pub fn random_in_range(min: f64, max: f64) -> Vec3 {
+    Vec3 { e: [random_double_range(min, max), random_double_range(min, max), random_double_range(min, max)] }
+}
+
+/*
+ * Random unit vector
+ * 
+ * Rejection method:
+ * 1. Generate random vector in [-1, 1] (in a unit sphere)
+ * 2. If the point lies outside the unit sphere or in "black hole" (1e-160 < len_sq <= 1.0), reject it and try again
+ * 3. If the point lies inside the unit sphere, return the unit vector
+ */
+pub fn random_unit_vector() -> Vec3 {
+    loop {
+        let p = random_in_range(-1.0, 1.0);
+        let len_sq = p.length_squared();
+        if (1e-160 < len_sq) && (len_sq <= 1.0) {
+            return p / len_sq.sqrt();
+        }
+    }
+}
+
+/*
+ * Random vector on a hemisphere
+ * 
+ * If the dot product of the random vector and the normal is positive, vector is in the correct hemisphere
+ * Otherwise, vector is in the opposite hemisphere & need to invert
+ */
+pub fn random_on_hemisphere(normal: Vec3) -> Vec3 {
+    let on_unit_sphere = random_unit_vector();
+    if on_unit_sphere.dot(&normal) > 0.0 {
+        on_unit_sphere
+    } else {
+        -on_unit_sphere
+    }
+}
+
+/*
+ * Reflected ray direction: v + 2b where b is the vector projection of v onto n
+ */
+pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
+    v - 2.0 * v.dot(&n) * n
+}
