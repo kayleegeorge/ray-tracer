@@ -1,16 +1,24 @@
-# Ray Tracing in Rust
+## Ray Tracing in Rust
 
-## Motivation
+Got really into Arcane and started learning about computer graphics lol, so I made a simple ray tracer in Rust.
 
-Got really into Arcane and started learning about computer graphics lol. Made a simple ray tracer in Rust.
+LOOK HOW COOL i am so happy 
 
-## Resources
+![Default](./images/ray-tracer-output.jpg)
+*(This took a few hours to fully render so I will need to speed it up a lot...)*
 
-Used https://raytracing.github.io/, very good guide.
+The evolution if you're curious...
 
-## TODO
+![V0](./images/v0.jpg)
+![V1](./images/v1.jpg)
 
-- [ ] Add fun materials
+### Resources
+
+Used https://raytracing.github.io/ (very good).
+
+### TODO
+
+- [ ] Add fun materials (like swirly glass)
 - [ ] Add confirgurable camera 
-- [ ] Speed up rendering
-- [ ] Maybe add a scene editor
+- [ ] Speed up rendering & performance
+- [ ] Maybe add a scene editor UI??
