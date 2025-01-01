@@ -1,5 +1,7 @@
 use crate::modules::vec3::Vec3;
 
+use super::utils::random_double;
+
 pub type Color = Vec3;
 
 /*
